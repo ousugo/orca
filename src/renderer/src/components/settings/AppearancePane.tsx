@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { AppWindow, PanelLeft, TerminalSquare } from 'lucide-react'
 
 import type { GlobalSettings } from '../../../../shared/types'
@@ -30,7 +30,7 @@ import { TerminalAppearanceSection } from './TerminalAppearanceSection'
 import type { UseGhosttyImportReturn } from './useGhosttyImport'
 import type { UseWarpThemeImportReturn } from './useWarpThemeImport'
 import { AppIconSelector } from './AppIconSelector'
-import { normalizeAppIconId } from '../../../../shared/app-icon'
+import { normalizeAppIconId, type AppIconId } from '../../../../shared/app-icon'
 import { getRendererAppPlatform } from '@/lib/renderer-app-platform'
 import { isWebClientLocation } from '@/lib/web-client-location'
 import { SHOW_UI_LANGUAGE_SETTING } from '@/i18n/supported-languages'
@@ -62,6 +62,10 @@ const ALL_APPEARANCE_SECTIONS = [
   'window'
 ] as const satisfies readonly AppearanceSectionKey[]
 
+// Why: the renderer lifetime matches the restart boundary, while AppearancePane
+// itself is unmounted whenever the user visits another settings section.
+let windowsStartupAppIcon: AppIconId | undefined
+
 export function AppearancePane({
   settings,
   updateSettings,
@@ -84,6 +88,15 @@ export function AppearancePane({
   // browser web client has no local tray to control.
   const isDesktopWindows = getRendererAppPlatform() === 'win32' && !isWebClient
   const isDesktopMac = getRendererAppPlatform() === 'darwin' && !isWebClient
+  const persistedAppIcon = normalizeAppIconId(settings.appIcon)
+  if (isDesktopWindows && windowsStartupAppIcon === undefined) {
+    windowsStartupAppIcon = persistedAppIcon
+  }
+  const [selectedAppIcon, setSelectedAppIcon] = useState(persistedAppIcon)
+
+  useEffect(() => {
+    setSelectedAppIcon(persistedAppIcon)
+  }, [persistedAppIcon])
 
   // Why: Terminal / Window settings were too easy to miss when only Interface
   // started open; keep sections independently collapsible but expanded by default.
@@ -293,8 +306,17 @@ export function AppearancePane({
           className="max-w-none px-1 pt-2"
         >
           <AppIconSelector
-            value={normalizeAppIconId(settings.appIcon)}
-            onChange={(appIcon) => updateSettings({ appIcon })}
+            value={selectedAppIcon}
+            onChange={(appIcon) => {
+              setSelectedAppIcon(appIcon)
+              updateSettings({ appIcon })
+            }}
+            restartRequired={
+              isDesktopWindows && windowsStartupAppIcon !== undefined
+                ? selectedAppIcon !== windowsStartupAppIcon
+                : false
+            }
+            onRestart={isDesktopWindows ? () => window.api.app.restart() : undefined}
           />
         </SearchableSetting>
       ) : null}
