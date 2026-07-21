@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve, win32 } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -13,6 +13,15 @@ function itWindows(name, test) {
 }
 
 describe('Windows Programs known-folder bridge', () => {
+  it('emits UTF-8 for redirected folder names', () => {
+    const source = readFileSync(
+      join(projectRoot, 'native', 'windows-programs-path', 'WindowsProgramsPath.cs'),
+      'utf8'
+    )
+
+    expect(source).toContain('Console.OutputEncoding = new UTF8Encoding(false);')
+  })
+
   itCrossHost('fails closed when the bridge cannot be compiled on this host', () => {
     const outputRoot = mkdtempSync(join(tmpdir(), 'orca cross-host programs path '))
     try {

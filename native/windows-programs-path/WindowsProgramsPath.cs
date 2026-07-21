@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 internal static class WindowsProgramsPath
 {
@@ -27,6 +28,9 @@ internal static class WindowsProgramsPath
                 Marshal.ThrowExceptionForHR(result);
             }
 
+            // Why: Node decodes bridge output as UTF-8, while legacy Windows
+            // console code pages cannot represent every redirected folder name.
+            Console.OutputEncoding = new UTF8Encoding(false);
             Console.Out.WriteLine(Marshal.PtrToStringUni(pathPointer));
             return 0;
         }
