@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 const itCrossHost = process.platform === 'win32' ? it.skip : it
 const projectRoot = resolve(import.meta.dirname, '../..')
+const buildScriptPath = join(projectRoot, 'config', 'scripts', 'build-windows-programs-path.mjs')
 
 function itWindows(name, test) {
   const runner = process.platform === 'win32' ? it : it.skip
@@ -27,11 +28,7 @@ describe('Windows Programs known-folder bridge', () => {
     try {
       const result = spawnSync(
         process.execPath,
-        [
-          'config/scripts/build-windows-programs-path.mjs',
-          '--output',
-          join(outputRoot, 'bridge.exe')
-        ],
+        [buildScriptPath, '--output', join(outputRoot, 'bridge.exe')],
         { cwd: projectRoot, encoding: 'utf8' }
       )
 
@@ -47,11 +44,10 @@ describe('Windows Programs known-folder bridge', () => {
     const outputRoot = mkdtempSync(join(tmpdir(), 'orca programs path '))
     try {
       const bridgePath = join(outputRoot, 'orca-programs-path.exe')
-      const build = spawnSync(
-        process.execPath,
-        ['config/scripts/build-windows-programs-path.mjs', '--output', bridgePath],
-        { cwd: projectRoot, encoding: 'utf8' }
-      )
+      const build = spawnSync(process.execPath, [buildScriptPath, '--output', bridgePath], {
+        cwd: projectRoot,
+        encoding: 'utf8'
+      })
       expect(build.status, `${build.stdout}\n${build.stderr}`).toBe(0)
 
       const query = spawnSync(bridgePath, [], { encoding: 'utf8' })

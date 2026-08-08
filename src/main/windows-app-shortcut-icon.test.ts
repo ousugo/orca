@@ -9,6 +9,7 @@ describe('Windows app shortcut icon', () => {
     const readShortcutLink = vi.fn((shortcutPath: string) => ({
       target: 'C:\\Program Files\\Orca\\Orca.exe',
       args: shortcutPath.includes('Desktop') ? '--desktop' : '',
+      appUserModelId: 'com.example.existing-orca',
       cwd: 'C:\\Program Files\\Orca',
       description: 'Orca'
     }))
@@ -17,7 +18,6 @@ describe('Windows app shortcut icon', () => {
     const result = updateWindowsAppShortcutIcon('C:\\icons\\orca-watercolor.ico', {
       appDataPath: 'C:\\Users\\Test\\AppData\\Roaming',
       appName: 'Orca',
-      appUserModelId: 'com.stablyai.orca',
       desktopPath: 'C:\\Users\\Test\\Desktop',
       executablePath: 'C:\\Program Files\\Orca\\Orca.exe',
       isPackaged: true,
@@ -34,7 +34,7 @@ describe('Windows app shortcut icon', () => {
     })
     expect(getProgramsPath).toHaveBeenCalledOnce()
     expect(writeShortcutLink).toHaveBeenNthCalledWith(1, `${programsPath}\\Orca.lnk`, 'update', {
-      appUserModelId: 'com.stablyai.orca',
+      appUserModelId: 'com.example.existing-orca',
       args: '',
       cwd: 'C:\\Program Files\\Orca',
       description: 'Orca',
@@ -47,7 +47,7 @@ describe('Windows app shortcut icon', () => {
       'C:\\Users\\Test\\Desktop\\Orca.lnk',
       'update',
       expect.objectContaining({
-        appUserModelId: 'com.stablyai.orca',
+        appUserModelId: 'com.example.existing-orca',
         args: '--desktop',
         icon: 'C:\\icons\\orca-watercolor.ico',
         iconIndex: 0,
@@ -62,7 +62,6 @@ describe('Windows app shortcut icon', () => {
     const result = updateWindowsAppShortcutIcon('C:\\icons\\orca-blue.ico', {
       appDataPath: 'C:\\Users\\Test\\AppData\\Roaming',
       appName: 'Orca',
-      appUserModelId: 'com.stablyai.orca',
       desktopPath: 'C:\\Users\\Test\\Desktop',
       executablePath: 'C:\\Program Files\\Orca\\Orca.exe',
       getProgramsPath: () =>
@@ -83,7 +82,6 @@ describe('Windows app shortcut icon', () => {
     const baseOptions = {
       appDataPath: 'C:\\Users\\Test\\AppData\\Roaming',
       appName: 'Orca',
-      appUserModelId: 'com.stablyai.orca',
       desktopPath: 'C:\\Users\\Test\\Desktop',
       getProgramsPath: () =>
         'C:\\Users\\Test\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs',
@@ -117,7 +115,6 @@ describe('Windows app shortcut icon', () => {
     const result = updateWindowsAppShortcutIcon('C:\\icons\\orca-blue.ico', {
       appDataPath: 'C:\\Users\\Test\\AppData\\Roaming',
       appName: 'Orca',
-      appUserModelId: 'com.stablyai.orca',
       desktopPath: 'C:\\Users\\Test\\Desktop',
       executablePath: 'C:\\Orca.exe',
       getProgramsPath: () =>

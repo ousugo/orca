@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs'
 import { win32 } from 'node:path'
 import { app, shell } from 'electron'
 
-import { getDevInstanceIdentity } from './startup/dev-instance-identity'
 import { getWindowsProgramsPath } from './windows-programs-path'
 
 type ReadShortcutLink = (shortcutPath: string) => Electron.ShortcutDetails
@@ -15,7 +14,6 @@ type WriteShortcutLink = (
 type UpdateWindowsAppShortcutIconOptions = {
   appDataPath?: string
   appName?: string
-  appUserModelId?: string
   desktopPath?: string
   executablePath?: string
   getProgramsPath?: () => string
@@ -64,7 +62,6 @@ export function updateWindowsAppShortcutIcon(
   const appDataPath = options.appDataPath ?? app.getPath('appData')
   const desktopPath = options.desktopPath ?? app.getPath('desktop')
   const executablePath = options.executablePath ?? process.execPath
-  const appUserModelId = options.appUserModelId ?? getDevInstanceIdentity(false).appUserModelId
   const pathExists = options.pathExists ?? existsSync
   const readShortcutLink = options.readShortcutLink ?? shell.readShortcutLink.bind(shell)
   const writeShortcutLink = options.writeShortcutLink ?? shell.writeShortcutLink.bind(shell)
@@ -95,7 +92,6 @@ export function updateWindowsAppShortcutIcon(
       }
       const updated = writeShortcutLink(shortcutPath, 'update', {
         ...current,
-        appUserModelId,
         icon: iconPath,
         iconIndex: 0
       })
