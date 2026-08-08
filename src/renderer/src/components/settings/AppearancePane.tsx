@@ -62,10 +62,6 @@ const ALL_APPEARANCE_SECTIONS = [
   'window'
 ] as const satisfies readonly AppearanceSectionKey[]
 
-// Why: the renderer lifetime matches the restart boundary, while AppearancePane
-// itself is unmounted whenever the user visits another settings section.
-let windowsStartupAppIcon: AppIconId | undefined
-
 export function AppearancePane({
   settings,
   updateSettings,
