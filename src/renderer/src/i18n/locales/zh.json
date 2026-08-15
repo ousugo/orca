@@ -3509,6 +3509,18 @@
               }
             }
           },
+          "CaffeinateStatusSegment": {
+            "on": "始终开启",
+            "auto": "智能体",
+            "off": "关闭",
+            "active": "生效中",
+            "inactive": "未生效",
+            "ariaLabel": "防止休眠，{{status}}",
+            "title": "防止休眠",
+            "onDescription": "始终保持电脑唤醒",
+            "autoDescription": "智能体工作时保持唤醒",
+            "offDescription": "允许系统正常休眠"
+          },
           "SkillUpdateStatusSegment": {
             "runningLabel": "Updating skills",
             "runningOne": "Updating {{value0}}…",
